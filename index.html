@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Набор в клан 𝕃𝕠𝕤𝕥ℙ𝕒𝕣𝕠𝕕𝕚𝕤𝔼</title>
+<style>
+body {
+    font-family: 'Arial', sans-serif;
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+    background: url('file_0000000025587243ada0f5a38ab3f84e.png') no-repeat center center fixed;
+    background-size: cover;
+    color: #fff;
+}
+.container {
+    max-width: 800px;
+    margin: auto;
+    padding: 20px;
+}
+h2, h3 { text-align: center; }
+#registration, #welcome, #profiles { 
+    background: rgba(0,0,0,0.6); 
+    padding: 20px; 
+    border-radius: 15px; 
+    box-shadow: 0 0 15px rgba(0,0,0,0.5); 
+    margin-bottom: 20px; 
+}
+input, select, textarea { width: 100%; padding: 8px; margin: 5px 0 15px; border-radius: 5px; border: none; }
+button { padding: 10px 20px; border-radius: 10px; border: none; cursor: pointer; background: #4CAF50; color: #fff; font-weight: bold; }
+.announcement { background: rgba(255,255,255,0.1); padding: 15px; border-radius: 10px; text-align: center; line-height: 1.5; margin-bottom: 20px; }
+.profile { background: rgba(255,255,255,0.1); padding: 15px; margin: 10px 0; border-radius: 10px; display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; }
+.profile-info { flex: 1; white-space: pre-line; }
+.like { background: #4CAF50; margin-left:5px; }
+.dislike { background: #f44336; margin-left:5px; }
+#welcome img { width: 100%; border-radius: 15px; margin-bottom: 15px; }
+</style>
+</head>
+<body>
+<div class="container">
+
+
+
+<div id="welcome" style="display:none;">
+    <h2 id="greeting"></h2>
+    <div class="announcement">
+        Набор в клан 𝕃𝕠𝕤𝕥ℙ𝕒𝕣𝕠𝕕𝕚𝕤𝔼 будем рады всем.<br>
+        По вопросам писать в TG: @berserkprime<br>
+        С вас требуется Активность и адекватность.<br>
+        Смена ника не обязательна ✨
+    </div>
+
+    <h3>Отправить свою анкету</h3>
+    <div id="registrationForm">
+        <input type="text" id="pName" placeholder="Имя">
+        <input type="text" id="pNick" placeholder="Ник">
+        <input type="number" id="pAge" placeholder="Возраст">
+        <input type="text" id="pID" placeholder="Айди">
+        <input type="text" id="pTime" placeholder="Время (МСК)">
+        <select id="pActive">
+            <option value="Актив">Актив</option>
+            <option value="Не актив">Не актив</option>
+        </select>
+        <input type="text" id="pAdequate" placeholder="Адекватность">
+        <input type="text" id="pTelegram" placeholder="Telegram">
+        <button onclick="submitProfile()">Отправить анкету</button>
+    </div>
+</div>
+
+<div id="profiles" style="display:none;">
+    <h3>Анкеты участников</h3>
+    <div id="profileList"></div>
+</div>
+
+</div>
+
+<script>
+let profilesData = JSON.parse(localStorage.getItem('profilesData')) || [];
+
+function registerUser() {
+    const name = document.getElementById('userName').value.trim();
+    if(!name) { alert("Введите имя!"); return; }
+
+    document.getElementById('registration').style.display = 'none';
+    document.getElementById('welcome').style.display = 'block';
+    document.getElementById('profiles').style.display = 'block';
+    document.getElementById('greeting').textContent = `Привет, ${name}!`;
+
+    renderProfiles();
+}
+
+function submitProfile() {
+    const profile = {
+        name: document.getElementById('pName').value,
+        nick: document.getElementById('pNick').value,
+        age: document.getElementById('pAge').value,
+        id: document.getElementById('pID').value,
+        time: document.getElementById('pTime').value,
+        active: document.getElementById('pActive').value,
+        adequate: document.getElementById('pAdequate').value,
+        telegram: document.getElementById('pTelegram').value
+    };
+    profilesData.push(profile);
+    localStorage.setItem('profilesData', JSON.stringify(profilesData));
+    renderProfiles();
+
+    // Очистка формы
+    document.getElementById('pName').value = '';
+    document.getElementById('pNick').value = '';
+    document.getElementById('pAge').value = '';
+    document.getElementById('pID').value = '';
+    document.getElementById('pTime').value = '';
+    document.getElementById('pActive').value = 'Актив';
+    document.getElementById('pAdequate').value = '';
+    document.getElementById('pTelegram').value = '';
+}
+
+function renderProfiles() {
+    const list = document.getElementById('profileList');
+    list.innerHTML = '';
+    profilesData.forEach((p, index) => {
+        const div = document.createElement('div');
+        div.className = 'profile';
+        div.innerHTML = `
+            <div class="profile-info">
+<strong>${p.name}</strong>
+Ник: ${p.nick}
+Возраст: ${p.age}
+Айди: ${p.id}
+Время (МСК): ${p.time}
+Активность: ${p.active}
+Адекватность: ${p.adequate}
+Telegram: ${p.telegram}
+            </div>
+            <div>
+                <button class="like" onclick="likeProfile(${index})">👍</button>
+                <button class="dislike" onclick="dislikeProfile(${index})">👎</button>
+            </div>
+        `;
+        list.appendChild(div);
+    });
+}
+
+function likeProfile(index){ alert(`Вы лайкнули ${profilesData[index].name}`); }
+function dislikeProfile(index){ alert(`Вы дизлайкнули ${profilesData[index].name}`); }
+
+// Автозагрузка при перезагрузке страницы
+if(profilesData.length > 0){
+    document.getElementById('welcome').style.display = 'block';
+    document.getElementById('profiles').style.display = 'block';
+    renderProfiles();
+}
+
+
+</script>
+</body>
+</html>
+
+
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Фон с JS</title>
+<style>
+  body {
+    margin: 0;
+    height: 100vh;
+    background: linear-gradient(-45deg, #ff7e5f, #feb47b, #6a11cb, #2575fc);
+    background-size: 400% 400%;
+    animation: gradientMove 20s ease infinite;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    font-family: Arial, sans-serif;
+    transition: background 1s;
+  }
+
+  @keyframes gradientMove {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+
+  button {
+    padding: 10px 20px;
+    font-size: 1rem;
+    cursor: pointer;
+    border: none;
+    border-radius: 5px;
+    background: rgba(255,255,255,0.2);
+    color: white;
+    transition: background 0.3s;
+  }
+
+  button:hover {
+    background: rgba(255,255,255,0.4);
+  }
+</style>
+</head>
+<body>
+  <div>
+    <h1></h1>
+    <button id="changeColor">Сменить фон</button>
+  </div>
+
+<script>
+  const button = document.getElementById('changeColor');
+  const colors = [
+    'linear-gradient(-45deg, #ff7e5f, #feb47b, #6a11cb, #2575fc)',
+    'linear-gradient(-45deg, #11998e, #38ef7d, #0f2027, #203a43)',
+    'linear-gradient(-45deg, #ff512f, #dd2476, #1f4037, #99f2c8)'
+  ];
+
+  let index = 0;
+  button.addEventListener('click', () => {
+    index = (index + 1) % colors.length;
+    document.body.style.background = colors[index];
+<script>
+
+    <!-- Кнопка смены фона -->
+<div style="position: absolute; top: 220px; left: 20px; text-align: left;">
+  <button id="bgButton" style="
+    width: 140px;
+    height: 50px;
+    border-radius: 25px;
+    background: linear-gradient(135deg, #00BFFF, #1E90FF);
+    border: none;
+    font-weight: bold;
+    font-size: 14px;
+    cursor: pointer;
+    box-shadow: 0 6px 12px rgba(0,0,0,0.3);
+    color: white;
+  ">Сменить фон</button>
+</div>
+
+<script>
+  const bgButton = document.getElementById('bgButton');
+
+  // Массив градиентов / цветов для фона
+  const backgrounds = [
+    'linear-gradient(-45deg, #ff7e5f, #feb47b, #6a11cb, #2575fc)',
+    'linear-gradient(-45deg, #11998e, #38ef7d, #0f2027, #203a43)',
+    'linear-gradient(-45deg, #ff512f, #dd2476, #1f4037, #99f2c8)',
+    'linear-gradient(-45deg, #f7971e, #ffd200, #ff5f6d, #ffc371)',
+    'linear-gradient(-45deg, #2193b0, #6dd5ed, #cc2b5e, #753a88)'
+  ];
+
+  let currentIndex = 0;
+
+  bgButton.addEventListener('click', () => {
+    currentIndex = (currentIndex + 1) % backgrounds.length;
+    document.body.style.background = backgrounds[currentIndex];
+    document.body.style.backgroundSize = "400% 400%"; // чтобы градиент красиво растягивался
+    document.body.style.transition = "background 0.8s ease";
+  });
+</script>
+
+ <!-- Кнопка дропа -->
+<button id="lootButton" style="
+  position: absolute;
+  top: 300px;
+  left: 20px;
+  width: 140px;
+  height: 50px;
+  border-radius: 25px;
+  background: linear-gradient(135deg, #228B22, #32CD32);
+  border: none;
+  font-weight: bold;
+  color: white;
+  cursor: pointer;
+  box-shadow: 0 6px 12px rgba(0,0,0,0.3);
+">Дропнуть лут</button>
+
+<script>
+  const lootBtn = document.getElementById('lootButton');
+
+  lootBtn.addEventListener('click', () => {
+    const loot = document.createElement('div');
+    loot.textContent = '🎒';
+    loot.style.position = 'absolute';
+    loot.style.fontSize = '30px';
+    loot.style.top = Math.random() * (window.innerHeight - 50) + 'px';
+    loot.style.left = Math.random() * (window.innerWidth - 50) + 'px';
+    loot.style.transition = 'transform 1s ease, opacity 1s ease';
+    document.body.appendChild(loot);
+
+    // Лут падает вниз
+    loot.style.transform = 'translateY(50px)';
+    loot.style.opacity = '0';
+
+    setTimeout(() => loot.remove(), 1000);
+  });
+</script>
+
+<button id="shootBtn" style="
+  position: absolute;
+  top: 370px;
+  left: 20px;
+  width: 140px;
+  height: 50px;
+  border-radius: 25px;
+  background: linear-gradient(135deg, #FF4500, #FF6347);
+  border: none;
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+  box-shadow: 0 6px 12px rgba(0,0,0,0.3);
+">Выстрел 💥</button>
+
+<script>
+  const shootBtn = document.getElementById('shootBtn');
+
+  shootBtn.addEventListener('click', () => {
+    const shot = document.createElement('div');
+    shot.textContent = '💥';
+    shot.style.position = 'absolute';
+    shot.style.fontSize = '40px';
+    shot.style.top = Math.random() * (window.innerHeight - 50) + 'px';
+    shot.style.left = Math.random() * (window.innerWidth - 50) + 'px';
+    document.body.appendChild(shot);
+
+    setTimeout(() => shot.remove(), 800);
+  });
+</script>
+
+<div id="miniMap" style="
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  width: 150px;
+  height: 150px;
+  background: rgba(0,0,0,0.5);
+  border: 2px solid #FFD700;
+  border-radius: 10px;
+  overflow: hidden;
+">
+</div>
+
+<script>
+  const map = document.getElementById('miniMap');
+
+  function spawnDropOnMap() {
+    const drop = document.createElement('div');
+    drop.style.position = 'absolute';
+    drop.style.width = '10px';
+    drop.style.height = '10px';
+    drop.style.background = '#FF4500';
+    drop.style.borderRadius = '50%';
+    drop.style.top = Math.random() * (map.offsetHeight - 10) + 'px';
+    drop.style.left = Math.random() * (map.offsetWidth - 10) + 'px';
+    map.appendChild(drop);
+
+    setTimeout(() => drop.remove(), 2000);
+  }
+
+  setInterval(spawnDropOnMap, 1000); // каждые 1 сек появляются новые точки
+</script>
+
+<div id="miniMap" style="
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  width: 150px;
+  height: 150px;
+  background: rgba(0,0,0,0.5);
+  border: 2px solid #FFD700;
+  border-radius: 10px;
+  overflow: hidden;
+">
+</div>
+
+<script>
+  const map = document.getElementById('miniMap');
+
+  function spawnDropOnMap() {
+    const drop = document.createElement('div');
+    drop.style.position = 'absolute';
+    drop.style.width = '10px';
+    drop.style.height = '10px';
+    drop.style.background = '#FF4500';
+    drop.style.borderRadius = '50%';
+    drop.style.top = Math.random() * (map.offsetHeight - 10) + 'px';
+    drop.style.left = Math.random() * (map.offsetWidth - 10) + 'px';
+    map.appendChild(drop);
+
+    setTimeout(() => drop.remove(), 2000);
+  }
+
+  setInterval(spawnDropOnMap, 1000); // каждые 1 сек появляются новые точки
+
+<script>
+function spawnBarrel() {
+  const barrel = document.createElement('div');
+  barrel.textContent = '🛢️';
+  barrel.style.position = 'absolute';
+  barrel.style.fontSize = '40px';
+  barrel.style.top = Math.random() * (window.innerHeight - 50) + 'px';
+  barrel.style.left = Math.random() * (window.innerWidth - 50) + 'px';
+  barrel.style.cursor = 'pointer';
+  document.body.appendChild(barrel);
+
+  barrel.addEventListener('click', () => {
+    barrel.textContent = '💥';
+    barrel.style.fontSize = '60px';
+    setTimeout(() => barrel.remove(), 500);
+  });
+
+  setTimeout(() => barrel.remove(), 5000);
+}
+
+// Спавн бочки каждые 3 секунды
+setInterval(spawnBarrel, 3000);
+</script>
+
+<button id="lootBagBtn" style="
+  position: absolute; top: 440px; left: 20px; width: 140px; height: 50px;
+  border-radius: 25px; background: linear-gradient(135deg,#8B4513,#D2691E);
+  color:white; border:none; cursor:pointer; box-shadow:0 6px 12px rgba(0,0,0,0.3);
+">Лут-дроп 🎒</button>
+
+<script>
+const lootBagBtn = document.getElementById('lootBagBtn');
+
+lootBagBtn.addEventListener('click', () => {
+  const loot = document.createElement('div');
+  const items = ['💊','🔫','🪙','🩸','🧪'];
+  loot.textContent = items[Math.floor(Math.random()*items.length)];
+  loot.style.position = 'absolute';
+  loot.style.top = '-50px';
+  loot.style.left = Math.random() * (window.innerWidth - 50) + 'px';
+  loot.style.fontSize = '30px';
+  loot.style.transition = 'top 1.5s ease';
+  document.body.appendChild(loot);
+
+  setTimeout(() => loot.style.top = Math.random() * (window.innerHeight - 50) + 'px', 50);
+  setTimeout(() => loot.remove(), 2000);
+});
+</script>
+
+
+
+
+
+</body>
+</html>
